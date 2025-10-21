@@ -126,8 +126,17 @@
 `201 CREATED`
 ```json
 {
-  "message": "Reseña vacía creada exitosamente",
-  "data": { ... }
+    "message": "Reseña vacía creada exitosamente",
+    "data": {
+        "resenaID": 1,
+        "usuarioID": 123,
+        "productoID": 105,
+        "rating": 0,
+        "fhCreacion": "2025-10-21T19:39:15.779Z",
+        "estadoResena": "Vacia",
+        "likes": 0,
+        "likesArray": []
+    }
 }
 ```
 

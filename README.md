@@ -126,23 +126,32 @@
 `201 CREATED`
 ```json
 {
-  "message": "Reseña vacía creada exitosamente",
-  "data": {
-    "resenaID": 1,
-    "usuarioID": 123,
-    "productoID": 456,
-    "fhCreacion": "2025-10-19T10:30:00Z",
-    "estadoResena": "Vacia",
-    "rating": 0,
-    "likes": 0
-  }
+    "message": "Reseña vacía creada exitosamente",
+    "data": {
+        "resenaID": 1,
+        "usuarioID": 123,
+        "productoID": 105,
+        "rating": 0,
+        "fhCreacion": "2025-10-21T19:39:15.779Z",
+        "estadoResena": "Vacia",
+        "likes": 0,
+        "likesArray": []
+    }
 }
 ```
 
-`400 BAD REQUEST`
+`200 OK` (cuando compra más de una vez un mismo artículo)
 ```json
 {
-  "error": "Ya existe una reseña para este usuario y producto"
+  "message": "Ya existe una reseña para usuario 123 y producto 456",
+  "alreadyExists": true
+}
+```
+
+`500 INTERNAL SERVER ERROR`
+```json
+{
+  "error": "Error interno del servidor"
 }
 ```
 

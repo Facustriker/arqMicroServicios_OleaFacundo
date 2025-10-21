@@ -2,6 +2,7 @@ import { AppDataSource } from '../../tools/db';
 import { ResenaSchema } from '../schemas/ResenaSchema';
 import { Resena } from '../../domain/entities/Resena';
 import { IResenaRepository } from '../../domain/repositories/IResenaRepository';
+import { Like } from '../../domain/entities/Like';
 
 export class ResenaRepository implements IResenaRepository {
 
@@ -71,14 +72,29 @@ export class ResenaRepository implements IResenaRepository {
   }
 
   private toDomain(schema: ResenaSchema): Resena {
-    const resena = Resena.crearVacia(schema.usuarioID, schema.productoID);
-    resena.setResenaID(schema.resenaID);
-    
-    if (schema.estadoResena === 'Completa' && schema.resena && schema.rating > 0) {
-      resena.completar(schema.resena, schema.rating);
-    }
-    
-    return resena;
+  
+  const resena = Object.create(Resena.prototype);  // Crea instancia sin constructor
+  
+  resena['resenaID'] = schema.resenaID;
+  resena['usuarioID'] = schema.usuarioID;
+  resena['productoID'] = schema.productoID;
+  resena['resena'] = schema.resena;
+  resena['rating'] = schema.rating;
+  resena['fhCreacion'] = schema.fhCreacion; 
+  resena['fhResena'] = schema.fhResena;     
+  resena['estadoResena'] = schema.estadoResena;
+  resena['likes'] = schema.likes;
+  resena['likesArray'] = [];
+  
+  if (schema.likesArray && schema.likesArray.length > 0) {
+    schema.likesArray.forEach(likeSchema => {
+      const like = Like.crear(likeSchema.usuarioID, likeSchema.resenaID);
+      like.setLikeID(likeSchema.likeID);
+      resena.likesArray.push(like);
+    });
   }
+  
+  return resena;
+}
 
 }

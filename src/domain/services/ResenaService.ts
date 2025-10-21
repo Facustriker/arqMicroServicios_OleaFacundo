@@ -1,15 +1,16 @@
 import { IResenaRepository } from '../repositories/IResenaRepository';
 import { Resena } from '../entities/Resena';
+import { ResenaNoEncontradaError, ResenaYaExisteError } from '../errors/CustomErrors';
 
 export class ResenaService {
   constructor(private resenaRepository: IResenaRepository) {}
 
-  async crearResenaVacia(usuarioID: number, productoID: number): Promise<Resena> {
+  async crearResenaVacia(usuarioID: number, productoID: number): Promise<Resena | null> {
 
     const existente = await this.resenaRepository.findByUsuarioAndProducto(usuarioID, productoID);
     
     if (existente) {
-        throw new Error('Ya existe una reseña para este usuario y producto');
+        throw new ResenaYaExisteError(usuarioID, productoID);
     }
     
     const resena = Resena.crearVacia(usuarioID, productoID);
@@ -22,7 +23,7 @@ export class ResenaService {
     const resena = await this.resenaRepository.findById(resenaID);
 
     if(resena==null){
-        throw new Error('Error, la reseña seleccionada no existe');
+        throw new ResenaNoEncontradaError(resenaID);
     }
 
     if (resena.getEstadoResena()=='Completa') {

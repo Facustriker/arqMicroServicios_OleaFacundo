@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { ResenaService } from '../../domain/services/ResenaService';
+import { ResenaYaExisteError } from '../../domain/errors/CustomErrors';
 
 export class ResenaController {
   constructor(private resenaService: ResenaService) {}
@@ -16,7 +17,19 @@ export class ResenaController {
         data: resena
       });
     } catch (error: any) {
-      res.status(400).json({ error: error.message });
+      // La reseña para este artículo ya existe
+      if (error instanceof ResenaYaExisteError) {
+        return res.status(200).json({
+          message: error.message,
+          alreadyExists: true
+        });
+      }
+      
+      // Cualquier otro error
+      console.error('ERROR:', error);
+      res.status(500).json({ 
+        error: error.message
+      });
     }
   }
 

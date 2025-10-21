@@ -42,11 +42,7 @@ export class Resena {
       throw new Error("No se puede dar like a una reseña vacía");
     }
     
-    const yaExiste = this.likesArray.some(like => like.getUsuarioID() === usuarioID);
-    if (yaExiste) {
-      throw new Error("Este usuario ya dio like a esta reseña");
-    }
-    
+    // Solo incrementar, la validación se hace en el service
     this.likes++;
   }
 

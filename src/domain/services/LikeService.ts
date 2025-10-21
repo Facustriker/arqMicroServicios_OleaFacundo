@@ -1,6 +1,7 @@
 import { IResenaRepository } from '../repositories/IResenaRepository';
 import { Like } from '../entities/Like';
 import { ILikeRepository } from '../repositories/ILikeRepository';
+import { ResenaNoEncontradaError } from '../errors/CustomErrors';
 
 export class LikeService {
   constructor(
@@ -9,20 +10,26 @@ export class LikeService {
   ) {}
 
   async darLike(resenaID: number, usuarioID: number): Promise<void> {
-    
     const resena = await this.resenaRepository.findById(resenaID);
     
     if (!resena) {
-      throw new Error('Reseña no encontrada');
+      throw new ResenaNoEncontradaError(resenaID);
     }
 
-    resena.darLike(usuarioID);
-
-    const like = Like.crear(usuarioID, resenaID);  // Crea el Like acá
-    await this.likeRepository.save(like); 
+    const likeExistente = await this.likeRepository.findByUsuarioAndResena(usuarioID, resenaID);
     
+    if (likeExistente) {
+      throw new Error('Este usuario ya dio like a esta reseña');
+    }
+    
+    // Crear el Like
+    const like = Like.crear(usuarioID, resenaID);
+    await this.likeRepository.save(like);
+    
+    // Incrementar contador en la reseña
+    resena.darLike(usuarioID);  // No valida duplicados, solo incrementa
     await this.resenaRepository.save(resena);
-  }
+}
 
   async quitarLike(resenaID: number, usuarioID: number): Promise<void> {
     const resena = await this.resenaRepository.findById(resenaID);

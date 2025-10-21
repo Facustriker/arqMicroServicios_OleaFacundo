@@ -31,7 +31,9 @@ export class ResenaService {
 
     resena.completar(texto, rating);
 
-    return await this.resenaRepository.save(resena);
+    const guardada = await this.resenaRepository.save(resena);
+
+    return guardada;
   }
 
   async obtenerResenasPorProducto(productoID: number): Promise<Resena[]> {

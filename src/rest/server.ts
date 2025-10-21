@@ -1,5 +1,7 @@
 import express from 'express';
 import { env } from '../tools/env';
+import resenaRoutes from './routes/resenaRoutes';
+import likeRoutes from './routes/likeRoutes';
 
 export async function startRestServer() {
   const app = express();
@@ -7,8 +9,9 @@ export async function startRestServer() {
   // Middlewares
   app.use(express.json());
   
-  // Rutas (las vamos a agregar después)
-  // app.use('/api/resenas', resenasRouter);
+  // Rutas
+  app.use('/api/resenas', resenaRoutes);
+  app.use('/api/likes', likeRoutes);
   
   // Health check
   app.get('/health', (req, res) => {

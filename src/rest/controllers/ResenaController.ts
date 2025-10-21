@@ -38,7 +38,11 @@ export class ResenaController {
         data: resena
         });
     } catch (error: any) {
-        res.status(400).json({ error: error.message });
+      console.error('ERROR COMPLETO:', error);
+      res.status(400).json({ 
+        error: error.message,
+        stack: error.stack
+      });
     }
   }
 

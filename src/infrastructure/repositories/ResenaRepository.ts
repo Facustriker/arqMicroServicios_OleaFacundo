@@ -9,6 +9,11 @@ export class ResenaRepository implements IResenaRepository {
 
   async save(resena: Resena): Promise<Resena> {
     const schema = new ResenaSchema();
+    //Actualiza el ID para evitar crear duplicados
+    const resenaID = resena.getResenaID();
+    if (resenaID !== undefined) {
+      schema.resenaID = resenaID;
+    }
     schema.usuarioID = resena.getUsuarioID();
     schema.productoID = resena.getProductoID();
     schema.resena = resena.getResena() || ''; 

@@ -457,36 +457,39 @@
 
 ### Crear reseña vacía al confirmar orden
 
-**Queue:** `order-completed`
+**Exchange:** `order_placed` (tipo fanout)
+**Queue:** `reviews_order_placed`
 
 **Acción:** El microservicio escucha eventos de órdenes completadas y crea reseñas vacías automáticamente.
 
 **Body recibido**
 ```json
 {
-  "orderID": "ORD-12345",
-  "usuarioID": 123,
-  "productos": [
-    {
-      "productoID": 456,
-      "cantidad": 1
-    },
-    {
-      "productoID": 789,
-      "cantidad": 2
-    }
-  ],
-  "timestamp": "2025-10-19T10:30:00Z"
+  "correlation_id": "...",
+  "exchange": "",
+  "routing_key": "",
+  "message": {
+    "orderId": "49b07f3b-56ab-4ce0-a3d2-8329cc983a5a",
+    "cartId": "68fe7c1791050db297aa23f6",
+    "userId": "68a125eb61cef14c63f559ea",
+    "articles": [
+      {
+        "articleId": "68fe7484d4dce00902a4f008",
+        "quantity": 2
+      }
+    ]
+  }
 }
 ```
 
 **Workflow**
 
-Para cada producto en la orden:
-1. Verifica si ya existe una reseña para ese usuario-producto
-2. Si no existe, crea una reseña vacía
-3. Si ya existe, no hace nada (el usuario ya compró ese producto antes)
+Para cada artículo en la orden:
+1. Extrae el mensaje del wrapper (campo `message`)
+2. Verifica si ya existe una reseña para ese usuario-producto
+3. Si no existe, crea una reseña vacía en estado "Vacia"
+4. Si ya existe, ignora y continúa con el siguiente artículo
 
 **Resultado**
 
-Se crean reseñas vacías en estado "Vacia" listas para que el usuario las complete cuando desee.
+Se crean reseñas vacías automáticamente cuando el usuario realiza una compra, listas para que las complete cuando desee.

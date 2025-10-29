@@ -94,6 +94,11 @@
 **Relación:** Muchos Likes pertenecen a una Reseña (*.1)
 
 
+## Diagrama de clases
+
+<img width="664" height="682" alt="image" src="https://github.com/user-attachments/assets/0d59742b-9459-4876-882e-61eac4fcdca2" />
+
+
 
 
 ## Interfaz REST
@@ -476,18 +481,18 @@
 }
 ```
 
-`404 NOT FOUND`
-```json
-{
-  "error": "Reseña con ID [resenaID] no encontrada"
-}
-```
-
 `200 OK (En caso de que no hayan likes aun)`
 ```json
 {
     "resenaID": 3,
     "likes": 0
+}
+```
+
+`404 NOT FOUND`
+```json
+{
+  "error": "Reseña con ID [resenaID] no encontrada"
 }
 ```
 ---

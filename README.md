@@ -5,9 +5,9 @@
 
 ## CU: Crear reseña
 
-**Precondición:** Un producto fue comprado exitosamente (orden de compra en estado confirmada)
+**Precondición:** Un producto fue comprado (orden de compra creada)
 
-**Camino normal:** Al confirmar una orden se crea una reseña vacía que apunta al producto comprado. Esta reseña tiene el ID del producto comprado, el ID del usuario que lo compró y la fechaHora de creación de esta entidad vacía.
+**Camino normal:** Al crear una orden se crea una reseña vacía que apunta al producto comprado. Esta reseña tiene el ID del producto comprado, el ID del usuario que lo compró y la fechaHora de creación de esta entidad vacía.
 
 **Camino alternativo:** No es la primera compra del producto, ya no se crean más reseñas.
 
@@ -17,9 +17,9 @@
 
 **Precondición:** Una reseña completa o vacía debe existir apuntando a este producto.
 
-**Camino normal:** Se busca una reseña vacía con el ID del producto seleccionado y con el usuarioID del usuario actualmente logueado. El usuario escribe la reseña y coloca el puntaje (un entero del 1 al 5). Se actualiza la reseña vacía haciéndola visible y agregando el contenido que el usuario acaba de ingresar (además se guarda la fecha y hora de esta actualización).
+**Camino normal:** Se busca una reseña vacía con el ID del producto seleccionado y con el usuarioID del usuario actualmente logueado. El usuario escribe la reseña y coloca el puntaje (un entero del 1 al 5). Se actualiza la reseña vacía haciéndola visible (cambiándole el estado a 'Completa') y agregando el contenido que el usuario acaba de ingresar (además se guarda la fecha y hora de esta actualización).
 
-**Camino alternativo:** Editar reseña. Se busca la reseña con el ID del producto seleccionado. El usuario escribe la nueva reseña y coloca el nuevo puntaje (un entero del 1 al 5). Se actualiza la reseña (además se guarda la fecha y hora de esta actualización).
+**Camino alternativo:** Actualizar reseña. Se busca la reseña con el ID del producto seleccionado. El usuario escribe la nueva reseña y coloca el nuevo puntaje (un entero del 1 al 5). Se actualiza la reseña (además se guarda la fecha y hora de esta actualización).
 
 ---
 
@@ -72,8 +72,8 @@
 | resenaID | int | Identificador único de la reseña |
 | fhCreacion | DateTime | Fecha y hora de creación (momento de compra) |
 | fhResena | DateTime | Fecha y hora en que se completó la reseña |
-| productoID | int | ID del producto reseñado |
-| usuarioID | int | ID del usuario que realizó la reseña |
+| productoID | String | ID del producto reseñado |
+| usuarioID | String | ID del usuario que realizó la reseña |
 | rating | int | Calificación del 1 al 5 |
 | resena | String | Texto de la reseña |
 | estadoResena | String | Estado: "Vacia" o "Completa" |
@@ -88,7 +88,7 @@
 | Atributo | Tipo | Descripción |
 |----------|------|-------------|
 | likeID | int | Identificador único del like |
-| usuarioID | int | ID del usuario que dio el like |
+| usuarioID | String | ID del usuario que dio el like |
 | resenaID | int | ID de la reseña a la que pertenece |
 
 **Relación:** Muchos Likes pertenecen a una Reseña (*.1)
@@ -131,8 +131,10 @@
         "resenaID": 1,
         "usuarioID": 123,
         "productoID": 105,
+        "resena": "",
         "rating": 0,
         "fhCreacion": "2025-10-21T19:39:15.779Z",
+        "fhResena": null,
         "estadoResena": "Vacia",
         "likes": 0,
         "likesArray": []
@@ -200,13 +202,6 @@
 }
 ```
 
-`400 BAD REQUEST`
-```json
-{
-  "error": "Error, la reseña ya está completa"
-}
-```
-
 `404 NOT FOUND`
 ```json
 {
@@ -258,13 +253,13 @@
 `404 NOT FOUND`
 ```json
 {
-  "error": "Reseña no encontrada"
+  "error": "Reseña con ID [resenaID] no encontrada"
 }
 ```
 
 ---
 
-### CU: Quitar like de reseña
+### Camino alternativo de CU 'Dar like a reseña' (quitar el like)
 `DELETE /api/likes/quitar`
 
 **Params path**
@@ -306,7 +301,7 @@
 `404 NOT FOUND`
 ```json
 {
-  "error": "Reseña no encontrada"
+  "error": "Reseña con ID [resenaID] no encontrada"
 }
 ```
 
@@ -321,7 +316,7 @@
 
 **Params query**
 
-*no tiene* (siempre ordenadas de mayor a menor likes)
+*no tiene* (siempre ordenadas de mayor a menor cantidad de likes)
 
 **Body**
 
@@ -347,6 +342,14 @@
       "fhResena": "2025-10-15T12:00:00Z",
       "estadoResena": "Completa",
       "likes": 25
+      "likesArray": [
+                {
+                    "likeID": 2,
+                    "usuarioID": "795",
+                    "resenaID": 2
+                },
+                {...}
+            ]
     },
     {
       "resenaID": 3,
@@ -358,8 +361,24 @@
       "fhResena": "2025-10-18T16:00:00Z",
       "estadoResena": "Completa",
       "likes": 12
+      "likesArray": [
+                {
+                    "likeID": 2,
+                    "usuarioID": "795",
+                    "resenaID": 2
+                },
+                {...}
+            ]
     }
   ]
+}
+```
+
+`200 OK (En caso de que no hayan reseñas hechas aun)`
+```json
+{
+    "data": [],
+    "cantidad": 0
 }
 ```
 
@@ -390,29 +409,42 @@
 ```json
 {
   "data": [
-    {
-      "resenaID": 1,
-      "usuarioID": 123,
-      "productoID": 456,
-      "fhCreacion": "2025-10-10T10:30:00Z",
-      "estadoResena": "Vacia",
-      "rating": 0,
-      "likes": 0
-    },
-    {
-      "resenaID": 8,
-      "usuarioID": 123,
-      "productoID": 789,
-      "fhCreacion": "2025-10-15T14:20:00Z",
-      "estadoResena": "Vacia",
-      "rating": 0,
-      "likes": 0
-    }
-  ],
-  "cantidad": 2
+        {
+            "resenaID": 3,
+            "usuarioID": "123",
+            "productoID": "4",
+            "resena": "",
+            "rating": 0,
+            "fhCreacion": "2025-10-29T23:03:22.000Z",
+            "fhResena": null,
+            "estadoResena": "Vacia",
+            "likes": 0,
+            "likesArray": []
+        },
+        {
+            "resenaID": 4,
+            "usuarioID": "123",
+            "productoID": "7",
+            "resena": "",
+            "rating": 0,
+            "fhCreacion": "2025-10-29T23:04:01.000Z",
+            "fhResena": null,
+            "estadoResena": "Vacia",
+            "likes": 0,
+            "likesArray": []
+        }
+    ],
+    "cantidad": 2
 }
 ```
 
+`200 OK (En caso de que no hayan reseñas pendientes)`
+```json
+{
+    "data": [],
+    "cantidad": 0
+}
+```
 ---
 
 ### CU: Consultar likes de una reseña
@@ -447,20 +479,27 @@
 `404 NOT FOUND`
 ```json
 {
-  "error": "Reseña no encontrada"
+  "error": "Reseña con ID [resenaID] no encontrada"
 }
 ```
 
+`200 OK (En caso de que no hayan likes aun)`
+```json
+{
+    "resenaID": 3,
+    "likes": 0
+}
+```
 ---
 
 ## Interfaz asincrónica (RabbitMQ)
 
-### Crear reseña vacía al confirmar orden
+### Crear reseña vacía al crear una orden de compra
 
 **Exchange:** `order_placed` (tipo fanout)
 **Queue:** `reviews_order_placed`
 
-**Acción:** El microservicio escucha eventos de órdenes completadas y crea reseñas vacías automáticamente.
+**Acción:** El microservicio escucha eventos de órdenes creadas y crea reseñas vacías automáticamente.
 
 **Body recibido**
 ```json

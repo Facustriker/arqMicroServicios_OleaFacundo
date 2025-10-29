@@ -1,24 +1,22 @@
 export class Like {
   private likeID?: number;
-  private usuarioID: number;
+  private usuarioID: string;
   private resenaID: number;
 
-  private constructor(usuarioID: number, resenaID: number) {
+  private constructor(usuarioID: string, resenaID: number) {
     this.usuarioID = usuarioID;
     this.resenaID = resenaID;
   }
 
-  // Factory method
-  static crear(usuarioID: number, resenaID: number): Like {
+  static crear(usuarioID: string, resenaID: number): Like {
     return new Like(usuarioID, resenaID);
   }
 
-  // Getters
   getLikeID(): number | undefined {
     return this.likeID;
   }
 
-  getUsuarioID(): number {
+  getUsuarioID(): string {
     return this.usuarioID;
   }
 

@@ -8,8 +8,10 @@ export class LikeController {
   async darLike(req: Request, res: Response) {
     try {
       const { resenaID, usuarioID } = req.body;
+
+      const usuarioIDStr = String(usuarioID);
       
-      await this.likeService.darLike(resenaID, usuarioID);
+      await this.likeService.darLike(resenaID, usuarioIDStr);
       
       res.status(200).json({
         message: 'Like agregado exitosamente'
@@ -23,8 +25,10 @@ export class LikeController {
   async quitarLike(req: Request, res: Response) {
     try {
       const { resenaID, usuarioID } = req.body;
+
+      const usuarioIDStr = String(usuarioID);
       
-      await this.likeService.quitarLike(resenaID, usuarioID);
+      await this.likeService.quitarLike(resenaID, usuarioIDStr);
       
       res.status(200).json({
         message: 'Like eliminado exitosamente'

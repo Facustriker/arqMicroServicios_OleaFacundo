@@ -2,17 +2,17 @@ import { Like } from "./Like";
 
 export class Resena {
   private resenaID?: number;
-  private usuarioID: number;
-  private productoID: number;
+  private usuarioID: string; 
+  private productoID: string; 
   private resena?: string;
   private rating: number;
   private fhCreacion: Date;
   private fhResena?: Date;
-  private estadoResena: string; // "Vacia" o "Completa"
+  private estadoResena: string;
   private likes: number;
   private likesArray: Like[];
 
-  private constructor(usuarioID: number, productoID: number) {
+  private constructor(usuarioID: string, productoID: string) {
     this.usuarioID = usuarioID;
     this.productoID = productoID;
     this.rating = 0;
@@ -22,7 +22,7 @@ export class Resena {
     this.likesArray = [];
   }
 
-  static crearVacia(usuarioID: number, productoID: number): Resena {
+  static crearVacia(usuarioID: string, productoID: string): Resena {
     return new Resena(usuarioID, productoID);
   }
 
@@ -37,16 +37,15 @@ export class Resena {
     this.estadoResena = "Completa";
   }
 
-  darLike(usuarioID: number): void {
+  darLike(usuarioID: string): void {
     if (this.estadoResena === "Vacia") {
       throw new Error("No se puede dar like a una reseña vacía");
     }
     
-    // Solo incrementar, la validación se hace en el service
     this.likes++;
   }
 
-  quitarLike(usuarioID: number): void {
+  quitarLike(usuarioID: string): void {  // ⬅️ Cambio parámetro
     const index = this.likesArray.findIndex(like => like.getUsuarioID() === usuarioID);
     if (index === -1) {
       throw new Error("Este usuario no ha dado like a esta reseña");
@@ -66,11 +65,11 @@ export class Resena {
     return this.resenaID;
   }
 
-  getUsuarioID(): number {
+  getUsuarioID(): string {
     return this.usuarioID;
   }
 
-  getProductoID(): number {
+  getProductoID(): string {
     return this.productoID;
   }
 

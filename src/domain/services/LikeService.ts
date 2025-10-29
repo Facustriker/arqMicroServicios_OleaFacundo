@@ -1,6 +1,6 @@
+import { ILikeRepository } from '../repositories/ILikeRepository';
 import { IResenaRepository } from '../repositories/IResenaRepository';
 import { Like } from '../entities/Like';
-import { ILikeRepository } from '../repositories/ILikeRepository';
 import { ResenaNoEncontradaError } from '../errors/CustomErrors';
 
 export class LikeService {
@@ -9,7 +9,7 @@ export class LikeService {
     private resenaRepository: IResenaRepository
   ) {}
 
-  async darLike(resenaID: number, usuarioID: number): Promise<void> {
+  async darLike(resenaID: number, usuarioID: string): Promise<void> { 
     const resena = await this.resenaRepository.findById(resenaID);
     
     if (!resena) {
@@ -22,44 +22,38 @@ export class LikeService {
       throw new Error('Este usuario ya dio like a esta reseña');
     }
     
-    // Crear el Like
     const like = Like.crear(usuarioID, resenaID);
     await this.likeRepository.save(like);
     
-    // Incrementar contador en la reseña
-    resena.darLike(usuarioID);  // No valida duplicados, solo incrementa
+    resena.darLike(usuarioID);
     await this.resenaRepository.save(resena);
-}
+  }
 
-  async quitarLike(resenaID: number, usuarioID: number): Promise<void> {
+  async quitarLike(resenaID: number, usuarioID: string): Promise<void> { 
     const resena = await this.resenaRepository.findById(resenaID);
     
     if (!resena) {
-        throw new Error('Reseña no encontrada');
+      throw new ResenaNoEncontradaError(resenaID);
     }
 
     const like = await this.likeRepository.findByUsuarioAndResena(usuarioID, resenaID);
     
     if (!like) {
-        throw new Error('Like no encontrado');
+      throw new Error('Este usuario no ha dado like a esta reseña');
     }
 
     resena.quitarLike(usuarioID);
-    
     await this.likeRepository.delete(like.getLikeID()!);
-    
     await this.resenaRepository.save(resena);
-    }
+  }
 
   async consultarLikes(resenaID: number): Promise<number> {
-
     const resena = await this.resenaRepository.findById(resenaID);
     
     if (!resena) {
-      throw new Error('Reseña no encontrada');
+      throw new ResenaNoEncontradaError(resenaID);
     }
 
     return resena.getLikes();
   }
-
 }

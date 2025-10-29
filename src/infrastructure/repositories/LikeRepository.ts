@@ -9,10 +9,12 @@ export class LikeRepository implements ILikeRepository {
 
     async save(like: Like): Promise<Like> {
         const schema = new LikeSchema();
+        
         const idLike = like.getLikeID();
         if (idLike !== undefined) {
-        schema.likeID = idLike;
+          schema.likeID = idLike;
         }
+        
         schema.usuarioID = like.getUsuarioID();
         schema.resenaID = like.getResenaID();
 
@@ -22,38 +24,37 @@ export class LikeRepository implements ILikeRepository {
     }
 
     async findById(id: number): Promise<Like | null> {
-        const schema = await this.repository.findOne({ 
-            where: { likeID: id }
-        });
-        
-        if (!schema) return null;
-        
-        return this.toDomain(schema);
+      const schema = await this.repository.findOne({ 
+        where: { likeID: id }
+      });
+      
+      if (!schema) return null;
+      
+      return this.toDomain(schema);
+    }
+
+    async findByUsuarioAndResena(usuarioID: string, resenaID: number): Promise<Like | null> {
+      const schema = await this.repository.findOne({
+        where: { usuarioID, resenaID }
+      });
+      
+      if (!schema) return null;
+      
+      return this.toDomain(schema);
     }
 
     async delete(id: number): Promise<void> {
-        await this.repository.delete(id);
-    }
-
-    async findByUsuarioAndResena(usuarioID: number, resenaID: number): Promise<Like | null> {
-        const schema = await this.repository.findOne({
-            where: { usuarioID, resenaID }
-        });
-        
-        if (!schema) return null;
-        
-        return this.toDomain(schema);
+      await this.repository.delete(id);
     }
 
     private toDomain(schema: LikeSchema): Like {
-        const like = Like.crear(schema.usuarioID, schema.resenaID);
-        
-        const likeID = schema.likeID;
-        if (likeID !== undefined) {
-            like.setLikeID(likeID);
-        }
-        
-        return like;
+      const like = Like.crear(schema.usuarioID, schema.resenaID);
+      
+      const likeID = schema.likeID;
+      if (likeID !== undefined) {
+        like.setLikeID(likeID);
+      }
+      
+      return like;
     }
-    
 }

@@ -1,5 +1,5 @@
 export class ResenaYaExisteError extends Error {
-  constructor(usuarioID: number, productoID: number) {
+  constructor(usuarioID: string, productoID: string) {  
     super(`Ya existe una reseña para usuario ${usuarioID} y producto ${productoID}`);
     this.name = 'ResenaYaExisteError';
   }

@@ -17,7 +17,6 @@ export class ResenaController {
         data: resena
       });
     } catch (error: any) {
-      // La reseña para este artículo ya existe
       if (error instanceof ResenaYaExisteError) {
         return res.status(200).json({
           message: error.message,
@@ -25,10 +24,9 @@ export class ResenaController {
         });
       }
       
-      // Cualquier otro error
-      console.error('ERROR:', error);
+      console.error('ERROR REAL:', error);
       res.status(500).json({ 
-        error: error.message
+        error: error.message || 'Error interno del servidor'
       });
     }
   }
@@ -36,20 +34,20 @@ export class ResenaController {
   // PUT /api/resenas/:id/completar
   async completarResena(req: Request, res: Response) {
     try {
-        const id = req.params.id;
-        if (!id) {
+      const id = req.params.id;
+      if (!id) {
         return res.status(400).json({ error: 'ID de reseña requerido' });
-        }
-        
-        const resenaID = parseInt(id);
-        const { texto, rating } = req.body;
-        
-        const resena = await this.resenaService.completarResena(resenaID, texto, rating);
-        
-        res.status(200).json({
+      }
+      
+      const resenaID = parseInt(id);
+      const { texto, rating } = req.body;
+      
+      const resena = await this.resenaService.completarResena(resenaID, texto, rating);
+      
+      res.status(200).json({
         message: 'Reseña completada exitosamente',
         data: resena
-        });
+      });
     } catch (error: any) {
       console.error('ERROR COMPLETO:', error);
       res.status(400).json({ 
@@ -62,41 +60,37 @@ export class ResenaController {
   // GET /api/resenas/producto/:productoID
   async obtenerResenasPorProducto(req: Request, res: Response) {
     try {
-        const productoIDParam = req.params.productoID;
-        if (!productoIDParam) {
+      const productoID = req.params.productoID; 
+      if (!productoID) {
         return res.status(400).json({ error: 'ID de producto requerido' });
-        }
-        
-        const productoID = parseInt(productoIDParam);
-        
-        const resenas = await this.resenaService.obtenerResenasPorProducto(productoID);
-        
-        res.status(200).json({
+      }
+      
+      const resenas = await this.resenaService.obtenerResenasPorProducto(productoID);
+      
+      res.status(200).json({
         data: resenas
-        });
+      });
     } catch (error: any) {
-        res.status(500).json({ error: error.message });
+      res.status(500).json({ error: error.message });
     }
   }
 
   // GET /api/resenas/pendientes/:usuarioID
   async obtenerResenasPendientes(req: Request, res: Response) {
     try {
-        const usuarioIDParam = req.params.usuarioID;
-        if (!usuarioIDParam) {
+      const usuarioID = req.params.usuarioID; 
+      if (!usuarioID) {
         return res.status(400).json({ error: 'ID de usuario requerido' });
-        }
-        
-        const usuarioID = parseInt(usuarioIDParam);
-        
-        const resenas = await this.resenaService.obtenerResenasPendientes(usuarioID);
-        
-        res.status(200).json({
+      }
+      
+      const resenas = await this.resenaService.obtenerResenasPendientes(usuarioID);
+      
+      res.status(200).json({
         data: resenas,
         cantidad: resenas.length
-        });
+      });
     } catch (error: any) {
-        res.status(500).json({ error: error.message });
+      res.status(500).json({ error: error.message });
     }
   }
 }

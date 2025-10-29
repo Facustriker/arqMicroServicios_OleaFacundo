@@ -8,10 +8,10 @@ export class ResenaSchema {
   resenaID: number;
 
   @Column()
-  usuarioID: number;
+  usuarioID: string;
 
   @Column()
-  productoID: number;
+  productoID: string;
 
   @Column({ type: 'text', nullable: true })
   resena: string;

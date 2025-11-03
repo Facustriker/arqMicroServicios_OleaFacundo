@@ -503,7 +503,8 @@ Los siguientes endpoints requieren un token JWT válido en el header `Authorizat
 ```json
 {
     "resenaID": 3,
-    "likes": 0
+    "likes": 0,
+    "likesArray": []
 }
 ```
 

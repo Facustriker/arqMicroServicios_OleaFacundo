@@ -47,13 +47,22 @@ export class LikeService {
     await this.resenaRepository.save(resena);
   }
 
-  async consultarLikes(resenaID: number): Promise<number> {
-    const resena = await this.resenaRepository.findById(resenaID);
-    
-    if (!resena) {
-      throw new ResenaNoEncontradaError(resenaID);
-    }
-
-    return resena.getLikes();
+  async consultarLikes(resenaID: number): Promise<any> {
+  const resena = await this.resenaRepository.findById(resenaID);
+  
+  if (!resena) {
+    throw new ResenaNoEncontradaError(resenaID);
   }
+
+  const likesArray = resena.getLikesArray().map(like => ({
+    likeID: like.getLikeID(),
+    usuarioID: like.getUsuarioID()
+  }));
+
+  return {
+    resenaID: resena.getResenaID(),
+    likes: resena.getLikes(),
+    likesArray
+  };
+}
 }

@@ -45,7 +45,7 @@ export class Resena {
     this.likes++;
   }
 
-  quitarLike(usuarioID: string): void {  // ⬅️ Cambio parámetro
+  quitarLike(usuarioID: string): void {
     const index = this.likesArray.findIndex(like => like.getUsuarioID() === usuarioID);
     if (index === -1) {
       throw new Error("Este usuario no ha dado like a esta reseña");

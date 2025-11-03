@@ -72,6 +72,27 @@ export class ResenaRepository implements IResenaRepository {
       relations: ['likesArray'],
       order: { likes: 'DESC' }
     });
+
+
+    //DEBUG BORRAR
+  console.log(`\n📦 findByProducto(${productoID})`);
+  console.log(`   Reseñas encontradas: ${schemas.length}`);
+  
+  schemas.forEach(s => {
+    console.log(`\n   Reseña ID: ${s.resenaID}`);
+    console.log(`   Usuario dueño: ${s.usuarioID}`);
+    console.log(`   Likes totales: ${s.likes}`);
+    console.log(`   likesArray.length: ${s.likesArray?.length || 0}`);
+    
+    if (s.likesArray && s.likesArray.length > 0) {
+      s.likesArray.forEach((like, idx) => {
+        console.log(`      Like ${idx + 1}: ID=${like.likeID}, Usuario=${like.usuarioID}`);
+      });
+    }
+  });
+
+
+
     
     return schemas.map(s => this.toDomain(s));
   }
@@ -102,14 +123,25 @@ export class ResenaRepository implements IResenaRepository {
     resena['estadoResena'] = schema.estadoResena;
     resena['likes'] = schema.likes;
     resena['likesArray'] = [];
+
+    // ⬅️ AGREGAR LOGS
+  console.log(`\n   🔄 toDomain() - Reseña ${schema.resenaID}`);
+  console.log(`      Schema likesArray: ${schema.likesArray?.length || 0} elementos`);
+  
     
     if (schema.likesArray && schema.likesArray.length > 0) {
       schema.likesArray.forEach(likeSchema => {
+        //BORRAR LOG
+        console.log(`      Reconstruyendo like: ID=${likeSchema.likeID}, Usuario=${likeSchema.usuarioID}`);
         const like = Like.crear(likeSchema.usuarioID, likeSchema.resenaID);
         like.setLikeID(likeSchema.likeID);
         resena['likesArray'].push(like);
       });
     }
+
+    //BORRAR
+    console.log(`      Resultado: ${resena['likesArray'].length} likes reconstruidos`);
+
     
     return resena;
   }

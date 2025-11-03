@@ -152,7 +152,6 @@ Los siguientes endpoints requieren un token JWT válido en el header `Authorizat
 **Body**
 ```json
 {
-  "usuarioID": 123,
   "productoID": 456
 }
 ```
@@ -160,7 +159,7 @@ Los siguientes endpoints requieren un token JWT válido en el header `Authorizat
 **Headers**
 
 - Content-Type: application/json
-- Authorization: Bearer {token}
+- Authorization: Bearer {token} (usuarioID se extrae del token)
 
 **Response**
 
@@ -188,13 +187,6 @@ Los siguientes endpoints requieren un token JWT válido en el header `Authorizat
 {
   "message": "Ya existe una reseña para usuario 123 y producto 456",
   "alreadyExists": true
-}
-```
-
-`500 INTERNAL SERVER ERROR`
-```json
-{
-  "error": "Error interno del servidor"
 }
 ```
 

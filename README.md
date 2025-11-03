@@ -100,6 +100,41 @@
 
 
 
+---
+
+# Autenticación y Seguridad
+
+Este microservicio utiliza **JWT (JSON Web Token)** para autenticación, validando tokens contra el microservicio de **Auth**.
+
+## Sistema de Caché
+
+- Los tokens validados se almacenan en **caché en memoria** por **30 minutos**
+- La primera validación llama al microservicio de Auth
+- Las siguientes validaciones usan el token en caché
+- El caché se limpia automáticamente cada 5 minutos
+
+## Endpoints Públicos
+
+- `GET /api/resenas/producto/{productoID}` - Ver reseñas de un producto
+  - Si se envía token válido, incluye el campo `userLiked` en cada reseña
+  - Si NO se envía token, `userLiked` siempre será `false`
+    
+- `GET /api/resenas/{id}/consultarLikes` - Ver likes de una reseña
+
+## Endpoints Protegidos
+
+Los siguientes endpoints requieren un token JWT válido en el header `Authorization: Bearer {token}`:
+
+- `POST /api/resenas/crear-vacia` - Crear reseña vacía
+- `PUT /api/resenas/{id}` - Completar/editar reseña
+- `GET /api/resenas/pendientes` - Ver reseñas pendientes del usuario
+- `POST /api/resenas/{id}/like` - Dar like a una reseña
+- `DELETE /api/resenas/{id}/dislike` - Quitar like de una reseña
+
+
+---
+
+
 
 ## Interfaz REST
 
@@ -125,6 +160,7 @@
 **Headers**
 
 - Content-Type: application/json
+- Authorization: Bearer {token}
 
 **Response**
 
@@ -186,6 +222,7 @@
 **Headers**
 
 - Content-Type: application/json
+- Authorization: Bearer {token}
 
 **Response**
 
@@ -217,7 +254,7 @@
 ---
 
 ### CU: Dar like a reseña
-`POST /api/likes/dar`
+`POST /api/resenas/{id}/like`
 
 **Params path**
 
@@ -228,16 +265,13 @@
 *no tiene*
 
 **Body**
-```json
-{
-  "resenaID": 1,
-  "usuarioID": 456
-}
-```
+
+*no tiene*
 
 **Headers**
 
 - Content-Type: application/json
+- Authorization: Bearer {token}
 
 **Response**
 
@@ -265,7 +299,7 @@
 ---
 
 ### Camino alternativo de CU 'Dar like a reseña' (quitar el like)
-`DELETE /api/likes/quitar`
+`DELETE /api/resenas/{id}/dislike`
 
 **Params path**
 
@@ -276,16 +310,13 @@
 *no tiene*
 
 **Body**
-```json
-{
-  "resenaID": 1,
-  "usuarioID": 456
-}
-```
+
+*no tiene*
 
 **Headers**
 
 - Content-Type: application/json
+- Authorization: Bearer {token}
 
 **Response**
 
@@ -347,14 +378,7 @@
       "fhResena": "2025-10-15T12:00:00Z",
       "estadoResena": "Completa",
       "likes": 25
-      "likesArray": [
-                {
-                    "likeID": 2,
-                    "usuarioID": "795",
-                    "resenaID": 2
-                },
-                {...}
-            ]
+      "userLiked": false
     },
     {
       "resenaID": 3,
@@ -366,14 +390,7 @@
       "fhResena": "2025-10-18T16:00:00Z",
       "estadoResena": "Completa",
       "likes": 12
-      "likesArray": [
-                {
-                    "likeID": 2,
-                    "usuarioID": "795",
-                    "resenaID": 2
-                },
-                {...}
-            ]
+      "userLiked": true
     }
   ]
 }
@@ -390,11 +407,11 @@
 ---
 
 ### CU: Listar productos a reseñar
-`GET /api/resenas/pendientes/{usuarioID}`
+`GET /api/resenas/pendientes`
 
 **Params path**
 
-- usuarioID: ID del usuario que consulta sus reseñas pendientes
+*no tiene* (usuarioID se extrae del token)
 
 **Params query**
 
@@ -406,7 +423,8 @@
 
 **Headers**
 
-*no tiene*
+- Content-Type: application/json
+- Authorization: Bearer {token}
 
 **Response**
 
@@ -423,8 +441,7 @@
             "fhCreacion": "2025-10-29T23:03:22.000Z",
             "fhResena": null,
             "estadoResena": "Vacia",
-            "likes": 0,
-            "likesArray": []
+            "likes": 0
         },
         {
             "resenaID": 4,
@@ -435,8 +452,7 @@
             "fhCreacion": "2025-10-29T23:04:01.000Z",
             "fhResena": null,
             "estadoResena": "Vacia",
-            "likes": 0,
-            "likesArray": []
+            "likes": 0
         }
     ],
     "cantidad": 2
@@ -453,7 +469,7 @@
 ---
 
 ### CU: Consultar likes de una reseña
-`GET /api/likes/resena/{resenaID}`
+`GET /api/resenas/{id}/consultarLikes`
 
 **Params path**
 
@@ -477,7 +493,17 @@
 ```json
 {
   "resenaID": 1,
-  "likes": 15
+  "likes": 2,
+  "likesArray": [
+    {
+      "likeID": 1,
+      "usuarioID": "68a125eb61cef14c63f559ea"
+    },
+    {
+      "likeID": 2,
+      "usuarioID": "68fe851ad4dce00902a4f02e"
+    }
+  ]
 }
 ```
 
